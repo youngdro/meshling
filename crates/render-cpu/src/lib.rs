@@ -109,7 +109,7 @@ impl<'a> Geometry<'a> {
 
     /// Call `f(pixel index, texture sample)` for every covered pixel of every triangle.
     fn raster(&self, size: Size, mut f: impl FnMut(usize, [f32; 4])) {
-        for tri in self.indices.chunks_exact(3) {
+        for tri in self.indices.as_chunks::<3>().0 {
             let [ia, ib, ic] = [tri[0] as usize, tri[1] as usize, tri[2] as usize];
             let (Some(&a), Some(&b), Some(&c)) =
                 (self.positions.get(ia), self.positions.get(ib), self.positions.get(ic))
