@@ -9,7 +9,21 @@ publish.workspace = true
 [lints]
 workspace = true
 
+[features]
+# A minimal PSD writer for tests in this and other crates.
+psd-writer = []
+
 [dependencies]
+meshling-geom.workspace = true
 meshling-model.workspace = true
+meshling-mesh.workspace = true
+meshling-plan.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
+png.workspace = true
+blake3.workspace = true
+
+[dev-dependencies]
+meshling-io = { path = ".", features = ["psd-writer"] }
+meshling-rig.workspace = true
+meshling-render-cpu.workspace = true

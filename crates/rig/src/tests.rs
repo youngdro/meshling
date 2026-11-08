@@ -212,3 +212,79 @@ fn malformed_projects_are_errors_not_panics() {
     p.meshes.push(mesh(20, None, KeyformGrid::single(form(&[(0.0, 0.0); 2], 1.0, 0))));
     assert_eq!(evaluate(&p, &ParamValues::new()), Err(RigError::PointCount { owner: id(20) }));
 }
+
+mod spaces {
+    use meshling_geom::Vec2;
+    use meshling_model::{Deformer, DeformerKind, KeyformGrid, Meta, ObjId, Project, RotationKeyform, WarpKeyform};
+
+    use crate::{ParamValues, RigError, to_canvas, to_local};
+
+    fn id(n: u128) -> ObjId {
+        ObjId::from_u128(n)
+    }
+
+    /// A bent 2×3 warp at the canvas, holding a rotation deformer.
+    fn project() -> Project {
+        let mut p = Project::new(meshling_geom::Size::new(100, 100));
+        let points: Vec<Vec2> = (0..3)
+            .flat_map(|y| {
+                (0..4).map(move |x| {
+                    Vec2::new(10.0 + 25.0 * x as f32 + 4.0 * y as f32, 10.0 + 30.0 * y as f32 + (x * x) as f32)
+                })
+            })
+            .collect();
+        p.deformers.push(Deformer {
+            meta: Meta::new("warp").with_id(id(1)),
+            parent: None,
+            kind: DeformerKind::Warp {
+                rows: 2,
+                cols: 3,
+                keyforms: KeyformGrid::single(WarpKeyform { points: points.into(), opacity: 1.0 }),
+            },
+        });
+        p.deformers.push(Deformer {
+            meta: Meta::new("rot").with_id(id(2)),
+            parent: Some(id(1)),
+            kind: DeformerKind::Rotation {
+                keyforms: KeyformGrid::single(RotationKeyform {
+                    origin: Vec2::new(0.5, 0.4),
+                    angle_deg: 30.0,
+                    scale: 0.01,
+                    opacity: 1.0,
+                }),
+            },
+        });
+        p
+    }
+
+    #[test]
+    fn to_local_inverts_to_canvas_inside_and_past_the_lattice() {
+        let p = project();
+        let v = ParamValues::new();
+        let canvas = [
+            Vec2::new(40.0, 40.0),
+            Vec2::new(12.0, 11.0),
+            Vec2::new(95.0, 75.0),
+            Vec2::new(5.0, 90.0),
+            Vec2::new(120.0, -3.0),
+        ];
+        for deformer in [None, Some(id(1)), Some(id(2))] {
+            let local = to_local(&p, &v, deformer, &canvas).unwrap();
+            let back = to_canvas(&p, &v, deformer, &local).unwrap();
+            for (a, b) in canvas.iter().zip(&back) {
+                assert!(a.distance(*b) < 1e-2, "{deformer:?}: {a} -> {b}");
+            }
+        }
+        let corner = to_local(&p, &v, Some(id(1)), &[Vec2::new(10.0, 10.0)]).unwrap();
+        assert!(corner[0].length() < 1e-4);
+    }
+
+    #[test]
+    fn a_collapsed_rotation_cannot_be_inverted() {
+        let mut p = project();
+        if let DeformerKind::Rotation { keyforms } = &mut p.deformers[1].kind {
+            keyforms.forms[0].scale = 0.0;
+        }
+        assert_eq!(to_local(&p, &ParamValues::new(), Some(id(2)), &[Vec2::ONE]), Err(RigError::NotInvertible(id(2))));
+    }
+}

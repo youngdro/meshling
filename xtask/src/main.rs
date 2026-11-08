@@ -102,6 +102,9 @@ fn check_layers(deps: &BTreeMap<String, Vec<String>>) -> Vec<String> {
             continue;
         };
         for dep in list {
+            if dep == name {
+                continue; // a crate dev-depending on itself, only to switch on test features
+            }
             if let Some(dl) = layer_of(dep) {
                 if dl > layer || (dl == layer && !SIDEWAYS.contains(&(name.as_str(), dep.as_str()))) {
                     errors.push(format!("{name} (L{layer}) depends on {dep} (L{dl}): only lower layers (or a listed SIDEWAYS pair) are allowed"));

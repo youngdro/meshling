@@ -14,3 +14,7 @@ meshling-model.workspace = true
 meshling-rig.workspace = true
 meshling-plan.workspace = true
 serde.workspace = true
+meshling-geom.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
