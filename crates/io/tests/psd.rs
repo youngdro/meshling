@@ -8,9 +8,7 @@ use meshling_io::psd::premultiply;
 use meshling_io::{PsdError, read_psd};
 use meshling_model::Blend;
 
-mod common;
-
-use common::{Spec, write_psd};
+use meshling_io::psd_writer::{Spec, write_psd};
 
 #[test]
 fn reads_offsets_order_and_premultiplies() {
@@ -172,7 +170,7 @@ fn reads_a_real_see_through_export() {
 
 #[test]
 fn corrupted_files_error_instead_of_panicking() {
-    let solid = |x: u32, y: u32| [x as u8, y as u8, 7, if (x + y) % 5 == 0 { 0 } else { 255 }];
+    let solid = |x: u32, y: u32| [x as u8, y as u8, 7, if (x + y).is_multiple_of(5) { 0 } else { 255 }];
     let good = write_psd(
         24,
         24,

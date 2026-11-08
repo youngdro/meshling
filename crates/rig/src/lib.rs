@@ -89,6 +89,8 @@ pub enum RigError {
     Grid { owner: ObjId },
     #[error("{owner}: form has the wrong number of points")]
     PointCount { owner: ObjId },
+    #[error("a point cannot be expressed in deformer {0}'s space (it folds or collapses there)")]
+    NotInvertible(ObjId),
 }
 
 /// Pose every mesh of `project` at `values`.
@@ -99,6 +101,50 @@ pub fn evaluate(project: &Project, values: &ParamValues) -> Result<Pose, RigErro
     }
     let meshes = project.meshes.iter().map(|m| pose_mesh(project, values, m, &frames)).collect::<Result<_, _>>()?;
     Ok(Pose { meshes })
+}
+
+/// Map `points` given in the child space of `deformer` (canvas space for `None`) to canvas
+/// space, at `values`.
+pub fn to_canvas(
+    project: &Project,
+    values: &ParamValues,
+    deformer: Option<ObjId>,
+    points: &[Vec2],
+) -> Result<Vec<Vec2>, RigError> {
+    let chain = chain(project, values, deformer)?;
+    Ok(points.iter().map(|&p| chain.iter().fold(p, |p, (_, f)| f.map.apply(p))).collect())
+}
+
+/// The inverse of [`to_canvas`]: express canvas `points` in the child space of `deformer`, so
+/// that a mesh or deformer moved under it keeps its place on screen at `values`.
+pub fn to_local(
+    project: &Project,
+    values: &ParamValues,
+    deformer: Option<ObjId>,
+    points: &[Vec2],
+) -> Result<Vec<Vec2>, RigError> {
+    let chain = chain(project, values, deformer)?;
+    points
+        .iter()
+        .map(|&p| chain.iter().rev().try_fold(p, |p, (id, f)| f.map.invert(p).ok_or(RigError::NotInvertible(*id))))
+        .collect()
+}
+
+/// `deformer` and its ancestors, innermost first, evaluated at `values`.
+fn chain(project: &Project, values: &ParamValues, deformer: Option<ObjId>) -> Result<Vec<(ObjId, Frame)>, RigError> {
+    let mut frames = HashMap::new();
+    let mut out = Vec::new();
+    let mut next = deformer;
+    while let Some(id) = next {
+        if out.len() > project.deformers.len() {
+            return Err(RigError::Cycle(id));
+        }
+        resolve(project, values, id, &mut frames, 0)?;
+        let frame = frames.get(&id).cloned().ok_or(RigError::MissingDeformer { owner: id, target: id })?;
+        next = frame.parent;
+        out.push((id, frame));
+    }
+    Ok(out)
 }
 
 /// A deformer evaluated at the current parameters: how it maps child points into canvas space.
@@ -126,6 +172,68 @@ impl FrameMap {
             }
         }
     }
+}
+
+impl FrameMap {
+    /// The child-space point that [`apply`](Self::apply) maps to `q`, if there is one.
+    fn invert(&self, q: Vec2) -> Option<Vec2> {
+        match self {
+            FrameMap::Warp { rows, cols, points } => unwarp(*rows, *cols, points, q),
+            FrameMap::Rotation { origin, angle_deg, scale } => {
+                if *scale == 0.0 || !scale.is_finite() {
+                    return None;
+                }
+                let (s, c) = angle_deg.to_radians().sin_cos();
+                let d = (q - *origin) / *scale;
+                Some(Vec2::new(c * d.x + s * d.y, -s * d.x + c * d.y))
+            }
+        }
+    }
+}
+
+/// Invert [`warp`]: find the cell whose bilinear patch (extended past the lattice border for
+/// border cells, as `warp` extrapolates) contains `q`, by Newton's method in each cell.
+fn unwarp(rows: usize, cols: usize, points: &[Vec2], q: Vec2) -> Option<Vec2> {
+    const EPS: f32 = 1e-4;
+    let at = |x: usize, y: usize| points[y * (cols + 1) + x];
+    let mut fallback = None;
+    for cy in 0..rows {
+        for cx in 0..cols {
+            let (p00, p10, p01, p11) = (at(cx, cy), at(cx + 1, cy), at(cx, cy + 1), at(cx + 1, cy + 1));
+            let f = |t: Vec2| p00.lerp(p10, t.x).lerp(p01.lerp(p11, t.x), t.y);
+            let mut t = Vec2::splat(0.5);
+            for _ in 0..30 {
+                let r = f(t) - q;
+                let du = (p10 - p00).lerp(p11 - p01, t.y);
+                let dv = p00.lerp(p10, t.x) * -1.0 + p01.lerp(p11, t.x);
+                let det = du.x * dv.y - du.y * dv.x;
+                if det.abs() < 1e-12 {
+                    break;
+                }
+                let step = Vec2::new(r.x * dv.y - r.y * dv.x, du.x * r.y - du.y * r.x) / det;
+                t -= step;
+                if step.length_squared() < 1e-14 {
+                    break;
+                }
+            }
+            if (f(t) - q).length() > 1e-3 * (1.0 + q.length()) || !t.is_finite() {
+                continue;
+            }
+            // Inside the cell, or past the lattice edge on a border cell.
+            let lo = |c: usize| if c == 0 { f32::NEG_INFINITY } else { -EPS };
+            let hi = |c: usize, n: usize| if c + 1 == n { f32::INFINITY } else { 1.0 + EPS };
+            let inside = (-EPS..=1.0 + EPS).contains(&t.x) && (-EPS..=1.0 + EPS).contains(&t.y);
+            let allowed = t.x >= lo(cx) && t.x <= hi(cx, cols) && t.y >= lo(cy) && t.y <= hi(cy, rows);
+            let p = Vec2::new((cx as f32 + t.x) / cols as f32, (cy as f32 + t.y) / rows as f32);
+            if inside {
+                return Some(p);
+            }
+            if allowed && fallback.is_none() {
+                fallback = Some(p);
+            }
+        }
+    }
+    fallback
 }
 
 /// Bilinear patch lookup in a `(rows + 1) × (cols + 1)` lattice, extrapolating past the border.

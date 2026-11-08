@@ -162,7 +162,7 @@ mod tests {
 
     #[test]
     fn deterministic() {
-        let f = |x: u32, y: u32| ((x * 7 + y * 13) % 5 == 0) as u8 * 255;
+        let f = |x: u32, y: u32| (x * 7 + y * 13).is_multiple_of(5) as u8 * 255;
         let o = MeshOptions { cells: 10, alpha_threshold: 0 };
         assert_eq!(auto_mesh(Size::new(50, 30), o, f), auto_mesh(Size::new(50, 30), o, f));
     }

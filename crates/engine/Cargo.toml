@@ -10,11 +10,19 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
+meshling-geom.workspace = true
 meshling-model.workspace = true
+meshling-mesh.workspace = true
 meshling-ops.workspace = true
 meshling-rig.workspace = true
 meshling-plan.workspace = true
 meshling-io.workspace = true
 meshling-validate.workspace = true
 meshling-render-cpu.workspace = true
+serde.workspace = true
 serde_json.workspace = true
+schemars.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+meshling-io = { workspace = true, features = ["psd-writer"] }

@@ -1,8 +1,10 @@
-//! A minimal PSD writer for tests: 8-bit RGBA layers, raw or RLE, with groups.
+//! A minimal PSD writer for tests (feature `psd-writer`): 8-bit RGBA layers, raw or RLE, with
+//! groups, so tests build their documents instead of committing binary fixtures.
 
-#![allow(dead_code, clippy::unwrap_used)]
+#![allow(clippy::unwrap_used, missing_docs)]
 
 /// A layer for the writer: straight RGBA rows, `w × h` at `(left, top)`.
+#[derive(Clone, Debug)]
 pub struct Spec {
     pub name: &'static str,
     pub left: i32,

@@ -4,6 +4,8 @@ pub mod image;
 pub mod import;
 pub mod project_dir;
 pub mod psd;
+#[cfg(feature = "psd-writer")]
+pub mod psd_writer;
 
 pub use image::{ImageError, content_hash, decode_png, encode_png};
 pub use import::{ImportOptions, Imported, import_psd};

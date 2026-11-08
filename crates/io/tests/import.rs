@@ -2,10 +2,8 @@
 
 #![allow(clippy::unwrap_used)] // test helpers outside #[test] fns
 
-mod common;
-
-use common::{Spec, write_psd};
 use meshling_io::import::PSD_TAG;
+use meshling_io::psd_writer::{Spec, write_psd};
 use meshling_io::{ImportOptions, Imported, PsdDocument, import_psd, load_project, read_psd, save_project};
 use meshling_model::{Blend, Project};
 use meshling_plan::{Pixels, plan};

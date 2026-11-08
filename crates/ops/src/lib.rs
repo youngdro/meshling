@@ -17,7 +17,15 @@ use serde::{Deserialize, Serialize};
 
 pub use object::{Kind, Object};
 
+/// A copy of the object `id`, whatever its kind.
+pub fn find(project: &Project, id: ObjId) -> Option<Object> {
+    let (kind, at) = object::locate(project, id)?;
+    object::get(project, kind, at)
+}
+
 /// One reversible change.
+// Ops live in history vectors and are moved rarely; boxing objects would only add allocations.
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "op", rename_all = "camelCase")]
 pub enum Op {
