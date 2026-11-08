@@ -1,0 +1,21 @@
+[package]
+name = "meshling-model"
+description = "L1: project data model (pure data + serde)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+meshling-geom.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+ulid.workspace = true
+
+# ULID generation needs randomness; in the browser it comes from `crypto.getRandomValues`.
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+getrandom = { version = "0.3", features = ["wasm_js"] }

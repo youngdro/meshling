@@ -1,0 +1,16 @@
+[package]
+name = "meshling-validate"
+description = "L4: programmatic validation reports"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+meshling-model.workspace = true
+meshling-rig.workspace = true
+meshling-plan.workspace = true
+serde.workspace = true

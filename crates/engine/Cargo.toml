@@ -1,0 +1,20 @@
+[package]
+name = "meshling-engine"
+description = "L5: Session, command registry, jobs, events"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+meshling-model.workspace = true
+meshling-ops.workspace = true
+meshling-rig.workspace = true
+meshling-plan.workspace = true
+meshling-io.workspace = true
+meshling-validate.workspace = true
+meshling-render-cpu.workspace = true
+serde_json.workspace = true
