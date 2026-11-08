@@ -652,10 +652,12 @@ dependencies = [
 name = "meshling-validate"
 version = "0.1.0"
 dependencies = [
+ "meshling-geom",
  "meshling-model",
  "meshling-plan",
  "meshling-rig",
  "serde",
+ "serde_json",
 ]
 
 [[package]]
