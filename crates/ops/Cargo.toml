@@ -12,3 +12,8 @@ workspace = true
 [dependencies]
 meshling-model.workspace = true
 thiserror.workspace = true
+meshling-geom.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true

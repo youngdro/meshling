@@ -1,2 +1,5 @@
 //! Import and export: PSD import, project directory read/write, PNG export.
-//! Implemented in week 4 of M1.
+
+pub mod psd;
+
+pub use psd::{PsdDocument, PsdError, PsdGroup, PsdLayer, read_psd};

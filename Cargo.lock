@@ -501,7 +501,9 @@ dependencies = [
 name = "meshling-io"
 version = "0.1.0"
 dependencies = [
+ "meshling-geom",
  "meshling-model",
+ "meshling-plan",
  "serde_json",
  "thiserror",
 ]
@@ -530,7 +532,10 @@ dependencies = [
 name = "meshling-ops"
 version = "0.1.0"
 dependencies = [
+ "meshling-geom",
  "meshling-model",
+ "serde",
+ "serde_json",
  "thiserror",
 ]
 
