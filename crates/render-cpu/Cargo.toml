@@ -18,3 +18,4 @@ thiserror.workspace = true
 
 [dev-dependencies]
 png = "0.18"
+meshling-plan = { workspace = true, features = ["fixtures"] }

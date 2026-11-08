@@ -13,3 +13,6 @@ workspace = true
 meshling-model.workspace = true
 meshling-rig.workspace = true
 meshling-geom.workspace = true
+
+[features]
+fixtures = []
