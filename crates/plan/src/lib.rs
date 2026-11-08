@@ -232,3 +232,6 @@ mod tests {
         assert_eq!(Pixels::solid(Size::new(2, 1), [1, 2, 3, 4]).get(1, 0), [1, 2, 3, 4]);
     }
 }
+
+#[cfg(feature = "fixtures")]
+pub mod fixtures;

@@ -28,8 +28,13 @@ const LAYERS: &[(&str, u8)] = &[
     ("meshling-cli", 7),
 ];
 
-/// Same-layer dependencies the architecture allows: both backends execute the planner's output.
-const SIDEWAYS: &[(&str, &str)] = &[("meshling-render-cpu", "meshling-plan"), ("meshling-render-gpu", "meshling-plan")];
+/// Same-layer dependencies the architecture allows: both backends execute the planner's output,
+/// and the GPU backend's parity tests use the CPU renderer as their oracle (dev-dependency only).
+const SIDEWAYS: &[(&str, &str)] = &[
+    ("meshling-render-cpu", "meshling-plan"),
+    ("meshling-render-gpu", "meshling-plan"),
+    ("meshling-render-gpu", "meshling-render-cpu"),
+];
 
 /// Crates that tie code to a UI toolkit or a window; only L6 and above may use them.
 const UI_CRATES: &[&str] = &["egui", "eframe", "egui-wgpu", "egui-winit", "winit", "rfd"];

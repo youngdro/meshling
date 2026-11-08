@@ -3,7 +3,7 @@
 Architecture doc (Chinese): https://claude.ai/artifact/JT2ebirqjgr4ohbUfwYCS3
 
 ## Rules that CI enforces
-- Layering: `cargo xtask layers`. A crate depends only on lower layers (table in `xtask/src/main.rs`; the only same-layer edges are render-cpu/render-gpu → plan). A new crate must be added to that table.
+- Layering: `cargo xtask layers`. A crate depends only on lower layers (table in `xtask/src/main.rs`; the only same-layer edges are render-cpu/render-gpu → plan, plus render-gpu → render-cpu as a test-only oracle). A new crate must be added to that table.
 - L0–L5 never depend on egui/eframe/winit/rfd and must build for `wasm32-unknown-unknown` (`cargo xtask wasm`).
 - `cargo clippy --workspace --all-targets -- -D warnings`, `cargo fmt --all --check`. `unwrap()` is denied outside tests; `unsafe` is forbidden.
 

@@ -51,11 +51,12 @@ jobs:
 
   gpu:
     # GPU tests on Mesa's software Vulkan driver (lavapipe), so CPU/GPU parity runs without a GPU.
-    # Tests whose name contains `gpu` run here; the first ones arrive with meshling-render-gpu.
+    # Tests whose name contains `gpu` run here and must find an adapter (no silent skip).
     name: gpu tests (lavapipe)
     runs-on: ubuntu-latest
     env:
       WGPU_BACKEND: vulkan
+      MESHLING_REQUIRE_GPU: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable

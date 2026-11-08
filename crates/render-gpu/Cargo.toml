@@ -12,3 +12,15 @@ workspace = true
 [dependencies]
 meshling-plan.workspace = true
 meshling-model.workspace = true
+meshling-geom.workspace = true
+meshling-rig.workspace = true
+wgpu.workspace = true
+bytemuck.workspace = true
+thiserror.workspace = true
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+pollster.workspace = true
+
+[dev-dependencies]
+meshling-render-cpu.workspace = true
+meshling-plan = { workspace = true, features = ["fixtures"] }
