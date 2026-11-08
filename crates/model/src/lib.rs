@@ -55,6 +55,12 @@ impl Meta {
     pub fn new(name: impl Into<String>) -> Self {
         Self { id: ObjId::new(), name: name.into(), tags: Vec::new(), provenance: Provenance::Human }
     }
+
+    /// The same metadata with a chosen id (fixtures, tests, imports that keep ids).
+    pub fn with_id(mut self, id: ObjId) -> Self {
+        self.id = id;
+        self
+    }
 }
 
 /// A source image (usually one PSD layer). Pixels live outside the model, keyed by `content_hash`.

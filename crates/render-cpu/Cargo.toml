@@ -12,3 +12,9 @@ workspace = true
 [dependencies]
 meshling-plan.workspace = true
 meshling-model.workspace = true
+meshling-geom.workspace = true
+meshling-rig.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+png = "0.18"

@@ -13,3 +13,7 @@ Architecture doc (Chinese): https://claude.ai/artifact/JT2ebirqjgr4ohbUfwYCS3
 - Model data is immutable and `Arc`-shared; a new field that can hold a large payload uses `Arc`.
 - Every object has a stable `ObjId`, a name, tags and `Provenance`; never key anything by name or index.
 - Project JSON must stay deterministic (same project → same bytes). A format change bumps `FORMAT_VERSION` and adds a step to `model::migrate`.
+
+## Rendering conventions (implemented in week 2)
+- Compositing table and coverage/sampling rules: doc comments of `meshling-plan` and `meshling-render-cpu`. Colours are premultiplied and blended in gamma space; warp lattices map bilinearly per cell.
+- Golden images live in `crates/render-cpu/tests/golden/`. After an intended rendering change run `MESHLING_BLESS=1 cargo test -p meshling-render-cpu` and commit the new PNGs; never bless to silence an unexplained diff.
