@@ -38,7 +38,7 @@ fn compare(r: &mut Renderer, p: &Project, values: &ParamValues, samples: u32) ->
     assert_eq!(cpu.len(), gpu.len());
     let mut worst = 0u8;
     let mut over = 0usize;
-    for (c, g) in cpu.chunks_exact(4).zip(gpu.chunks_exact(4)) {
+    for (c, g) in cpu.as_chunks::<4>().0.iter().zip(gpu.as_chunks::<4>().0) {
         let d = c.iter().zip(g).map(|(a, b)| a.abs_diff(*b)).max().unwrap_or(0);
         worst = worst.max(d);
         if d > 2 {
