@@ -1,0 +1,47 @@
+[workspace]
+resolver = "3"
+members = ["crates/*", "apps/*", "xtask"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+publish = false
+
+[workspace.dependencies]
+# internal
+meshling-geom = { path = "crates/geom" }
+meshling-model = { path = "crates/model" }
+meshling-rig = { path = "crates/rig" }
+meshling-physics = { path = "crates/physics" }
+meshling-mesh = { path = "crates/mesh" }
+meshling-ops = { path = "crates/ops" }
+meshling-plan = { path = "crates/plan" }
+meshling-render-cpu = { path = "crates/render-cpu" }
+meshling-render-gpu = { path = "crates/render-gpu" }
+meshling-io = { path = "crates/io" }
+meshling-validate = { path = "crates/validate" }
+meshling-ai = { path = "crates/ai" }
+meshling-engine = { path = "crates/engine" }
+meshling-ui-egui = { path = "crates/ui-egui" }
+meshling-automation = { path = "crates/automation" }
+
+# external
+glam = { version = "0.34", features = ["serde"] }
+serde = { version = "1", features = ["derive", "rc"] }
+serde_json = "1"
+thiserror = "2"
+ulid = { version = "1.2", features = ["serde"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_debug_implementations = "warn"
+
+[workspace.lints.clippy]
+unwrap_used = "deny"
+expect_used = "warn"
+dbg_macro = "deny"
+todo = "warn"
+
+[profile.dev.package."*"]
+opt-level = 2

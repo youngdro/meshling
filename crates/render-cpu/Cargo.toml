@@ -1,0 +1,14 @@
+[package]
+name = "meshling-render-cpu"
+description = "L3: CPU reference rasterizer (the oracle)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+meshling-plan.workspace = true
+meshling-model.workspace = true
