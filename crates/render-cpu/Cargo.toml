@@ -17,5 +17,5 @@ meshling-rig.workspace = true
 thiserror.workspace = true
 
 [dev-dependencies]
-png = "0.18"
+png.workspace = true
 meshling-plan = { workspace = true, features = ["fixtures"] }

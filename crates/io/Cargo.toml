@@ -12,6 +12,13 @@ workspace = true
 [dependencies]
 meshling-geom.workspace = true
 meshling-model.workspace = true
+meshling-mesh.workspace = true
 meshling-plan.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
+png.workspace = true
+blake3.workspace = true
+
+[dev-dependencies]
+meshling-rig.workspace = true
+meshling-render-cpu.workspace = true
